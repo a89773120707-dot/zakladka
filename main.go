@@ -9,7 +9,12 @@ import (
 func main() {
 	fmt.Println("===ЗАКЛАДКА===")
 	bookMark := make(map[string]string)
-menu:
+	commands := map[string]func(){
+		"1": func() { viewBookmark(bookMark) },
+		"2": func() { addBookMark(bookMark) },
+		"3": func() { deleteBookmark(bookMark) },
+	}
+
 	for {
 		fmt.Println("\nМЕНЮ:")
 		fmt.Println("1.Посмтреть закладки")
@@ -19,18 +24,17 @@ menu:
 
 		choice := readInput("Введите пункт меню: ")
 		fmt.Println("Ваш выбор: ", choice)
-		switch choice {
-		case "1":
-			viewBookmark(bookMark)
-		case "2":
-			addBookMark(bookMark)
-		case "3":
-			deleteBookmark(bookMark)
-		case "4":
-			fmt.Println("Вы нажали выход ")
-			break menu
-		default:
-			fmt.Println("Неверный пункт меню ")
+
+		if choice == "4" {
+			fmt.Println("Выход из программы ")
+			return
+		}
+
+		command, ok := commands[choice]
+		if ok {
+			command()
+		} else {
+			fmt.Println("Неверный пункт меню")
 		}
 
 	}
