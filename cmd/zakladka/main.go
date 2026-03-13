@@ -9,6 +9,7 @@ import (
 func main() {
 	fmt.Println("===ЗАКЛАДКА===")
 
+	service := bookmark.NewService()
 	menuOptions := map[string]string{
 		"1": "Посмотреть закладки",
 		"2": "Добавить закладку",
@@ -17,15 +18,31 @@ func main() {
 	}
 
 	commands := map[string]func(){
-		"1": func() { bookmark.ListBookmarks() },
+		"1": func() {
+			bookmarks := service.ListBookmarks()
+			if len(bookmarks) == 0 {
+				fmt.Println("Пока нет закладок ")
+				return
+			}
+			for name, url := range bookmarks {
+				fmt.Println(name, ":", url)
+			}
+
+		},
 		"2": func() {
 			name := cli.ReadInput("Введите название заклдаки: ")
 			url := cli.ReadInput("Введите URL заклдаки: ")
-			bookmark.AddBookmark(name, url)
+			service.AddBookmark(name, url)
+			fmt.Printf("Закладка '%s: %s' добавлена\n", name, url)
 		},
 		"3": func() {
 			name := cli.ReadInput("Введите название заклдаки: ")
-			bookmark.DeleteBookmark(name)
+			url, deleted := service.DeleteBookmark(name)
+			if deleted {
+				fmt.Printf("Закладка - '%s: %s' удалена\n", name, url)
+			} else {
+				fmt.Println("Такой закладки нет")
+			}
 		},
 	}
 

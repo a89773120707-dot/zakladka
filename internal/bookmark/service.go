@@ -1,29 +1,40 @@
 package bookmark
 
-import "fmt"
-
-var bookMarks = make(map[string]string)
-
-func AddBookmark(name string, url string) {
-	bookMarks[name] = url
-	fmt.Printf("Закладка '%s: %s' добавлена\n", name, url)
+type Bookmark struct {
+	Name string
+	URL  string
 }
 
-func DeleteBookmark(name string) {
-	_, ok := bookMarks[name]
-	if ok {
-		fmt.Printf("Закладка - '%s: %s' удалена\n", name, bookMarks[name])
-		delete(bookMarks, name)
-	} else {
-		fmt.Println("Такой закладки нет")
-	}
+type BookmarkService struct {
+	bookmarks map[string]*Bookmark
 }
 
-func ListBookmarks() {
-	if len(bookMarks) == 0 {
-		fmt.Println("Пока нет закладок ")
+func NewService() *BookmarkService {
+	return &BookmarkService{
+		bookmarks: make(map[string]*Bookmark),
 	}
-	for name, url := range bookMarks {
-		fmt.Println(name, ":", url)
+
+}
+func (b *BookmarkService) AddBookmark(name string, url string) {
+	b.bookmarks[name] = &Bookmark{
+		Name: name,
+		URL:  url,
 	}
+
+}
+
+func (b *BookmarkService) DeleteBookmark(name string) (string, bool) {
+	bookmark, ok := b.bookmarks[name]
+	if !ok {
+		return "", false
+	}
+	delete(b.bookmarks, name)
+	return bookmark.URL, true
+}
+func (b *BookmarkService) ListBookmarks() map[string]*Bookmark {
+	result := make(map[string]*Bookmark, len(b.bookmarks))
+	for name, bookmark := range b.bookmarks {
+		result[name] = bookmark
+	}
+	return result
 }
